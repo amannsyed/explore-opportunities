@@ -1,0 +1,5 @@
+{
+  "name": "UK Visa Sponsor Dashboard",
+  "description": "A comprehensive dashboard for exploring and filtering UK Visa Sponsor data. Features real-time filtering, data visualization, and high-performance select components.",
+  "requestFramePermissions": []
+}
