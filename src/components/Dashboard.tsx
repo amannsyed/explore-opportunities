@@ -558,8 +558,8 @@ export default function Dashboard() {
                 <MapPin className="h-3 w-3" /> Top 10 Towns
               </h3>
               {townData.length > 0 ? (
-                <div className="flex-1 min-h-0">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="flex-1 min-h-0 w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <BarChart data={townData} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
                       <XAxis type="number" hide />
@@ -586,8 +586,8 @@ export default function Dashboard() {
                 <RouteIcon className="h-3 w-3" /> Route Distribution
               </h3>
               {routeData.length > 0 ? (
-                <div className="flex-1 min-h-0">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="flex-1 min-h-0 w-full">
+                  <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <PieChart>
                       <Pie
                         data={routeData}
