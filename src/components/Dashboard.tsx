@@ -68,7 +68,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchSponsors = async () => {
       try {
-        const response = await fetch('/sponsors_list.json');
+        const response = await fetch('./sponsors_list.json');
         if (!response.ok) {
           throw new Error('Failed to load sponsors data');
         }
