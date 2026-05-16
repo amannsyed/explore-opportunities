@@ -1,0 +1,36 @@
+name: Update Sponsors List
+
+on:
+  schedule:
+    - cron: "20 20 * * *"  # Runs daily at 9:15 PM BST (20:15 UTC)
+  workflow_dispatch:       # Allows manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch and convert sponsor data
+        run: python scripts/fetch_sponsors.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/sponsors_list.json
+          git diff --staged --quiet || git commit -m "chore: update sponsors list $(date -u '+%Y-%m-%d')"
+          git push
