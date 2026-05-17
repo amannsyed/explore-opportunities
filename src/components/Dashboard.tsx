@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [lastUpdated, setLastUpdated] = useState('April 4, 2026');
+  const [lastUpdated, setLastUpdated] = useState('...');
 
   // Column resizing state
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -69,18 +69,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchSponsors = async () => {
       try {
-        const [sponsorsRes, statusRes] = await Promise.all([
-          fetch('./sponsors_list.json'),
-          fetch('./last_updated.json').catch(() => null)
-        ]);
-
-        if (!sponsorsRes.ok) {
-          throw new Error('Failed to load sponsors data');
-        }
-
+        // Fetch status first with a timestamp to bypass cache
+        const statusRes = await fetch(`./last_updated.json?t=${Date.now()}`).catch(() => null);
+        let cacheBuster = '';
+        
         if (statusRes && statusRes.ok) {
           const statusData = await statusRes.json();
           if (statusData.date && statusData.date !== 'Unknown') {
+            cacheBuster = `?v=${statusData.date}`;
             const date = new Date(statusData.date);
             if (!isNaN(date.getTime())) {
               const formatted = date.toLocaleDateString('en-US', { 
@@ -91,6 +87,12 @@ export default function Dashboard() {
               setLastUpdated(formatted);
             }
           }
+        }
+
+        const sponsorsRes = await fetch(`./sponsors_list.json${cacheBuster}`);
+
+        if (!sponsorsRes.ok) {
+          throw new Error('Failed to load sponsors data');
         }
 
         const rawData: any[] = await sponsorsRes.json();
