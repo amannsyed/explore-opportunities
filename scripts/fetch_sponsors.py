@@ -18,6 +18,10 @@ def fetch_and_convert():
     csv_url = get_csv_url()
     print(f"Fetching: {csv_url}")
 
+    # Extract date from filename if possible (e.g. 2026-05-14_-_Worker...)
+    date_match = re.search(r'(\d{4}-\d{2}-\d{2})', csv_url)
+    last_updated = date_match.group(1) if date_match else "Unknown"
+
     response = requests.get(csv_url)
     response.raise_for_status()
 
@@ -34,6 +38,10 @@ def fetch_and_convert():
     with open("public/sponsors_list.json", "w", encoding="utf-8") as f:
         json.dump(sponsors, f, ensure_ascii=False, indent=2)
 
+    with open("public/last_updated.json", "w", encoding="utf-8") as f:
+        json.dump({"date": last_updated}, f, ensure_ascii=False, indent=2)
+
     print(f"Written {len(sponsors)} sponsors to public/sponsors_list.json")
+    print(f"Last updated date: {last_updated}")
 
 fetch_and_convert()

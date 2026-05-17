@@ -23,6 +23,7 @@ export default function Dashboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [lastUpdated, setLastUpdated] = useState('April 4, 2026');
 
   // Column resizing state
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -68,11 +69,31 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchSponsors = async () => {
       try {
-        const response = await fetch('./sponsors_list.json');
-        if (!response.ok) {
+        const [sponsorsRes, statusRes] = await Promise.all([
+          fetch('./sponsors_list.json'),
+          fetch('./last_updated.json').catch(() => null)
+        ]);
+
+        if (!sponsorsRes.ok) {
           throw new Error('Failed to load sponsors data');
         }
-        const rawData: any[] = await response.json();
+
+        if (statusRes && statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.date && statusData.date !== 'Unknown') {
+            const date = new Date(statusData.date);
+            if (!isNaN(date.getTime())) {
+              const formatted = date.toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+              });
+              setLastUpdated(formatted);
+            }
+          }
+        }
+
+        const rawData: any[] = await sponsorsRes.json();
         const data: Sponsor[] = rawData.map((row, index) => {
           const clean = (val: string | undefined | null) => {
             if (!val) return '';
@@ -269,7 +290,7 @@ export default function Dashboard() {
                 <span className="text-slate-300">|</span>
                 <span className="flex items-center gap-1.5 font-medium text-slate-600">
                   <Calendar className="h-3 w-3 text-blue-500" />
-                  Last Updated: April 4, 2026
+                  Last Updated: {lastUpdated}
                 </span>
               </div>
             </div>
