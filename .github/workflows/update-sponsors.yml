@@ -2,11 +2,12 @@ name: Update Sponsors List
 
 on:
   schedule:
-    - cron: "30 2 * * *"    # Runs daily at 3:30 AM BST (02:30 UTC)
-  workflow_dispatch:       # Allows manual trigger from GitHub UI
+    - cron: "30 8 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write # Added: Required to trigger another workflow via CLI
 
 jobs:
   update:
@@ -28,9 +29,24 @@ jobs:
         run: python scripts/fetch_sponsors.py
 
       - name: Commit and push if changed
+        id: commit_step # Added an ID to reference this step later
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add public/sponsors_list.json public/last_updated.json
-          git diff --staged --quiet || git commit -m "chore: update sponsors list $(date -u '+%Y-%m-%d')"
-          git push
+          
+          # Check if there are changes. If yes, commit, push, and set output to true.
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "chore: update sponsors list $(date -u '+%Y-%m-%d')"
+            git push
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger Page Deploy
+        if: steps.commit_step.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml
