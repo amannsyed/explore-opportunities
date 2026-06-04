@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import Fuse from 'fuse.js';
 import FastSelect from './FastSelect';
 import { Sponsor } from '../data';
-import { Search, Filter, MapPin, Building2, Briefcase, Star, Route as RouteIcon, Calendar, ArrowUpDown, Database, Loader2, Download, RotateCcw } from 'lucide-react';
+import { Search, Filter, MapPin, Building2, Briefcase, Star, Route as RouteIcon, Calendar, ArrowUpDown, Database, Loader2, Download, RotateCcw, Sparkles } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const COLORS = ['#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e'];
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [selectedRoutes, setSelectedRoutes] = useState<readonly {value: string, label: string}[]>([]);
   const [orgSearch, setOrgSearch] = useState('');
   const [appliedOrgSearch, setAppliedOrgSearch] = useState('');
+  const [fuzzySearch, setFuzzySearch] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Sponsor; direction: 'asc' | 'desc' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showCharts, setShowCharts] = useState(false);
@@ -130,6 +132,7 @@ export default function Dashboard() {
     setSelectedRoutes([]);
     setOrgSearch('');
     setAppliedOrgSearch('');
+    setFuzzySearch(false);
     setCurrentPage(1);
   };
 
@@ -164,15 +167,32 @@ export default function Dashboard() {
     return unique.map(u => ({ value: u, label: u }));
   }, [sponsors]);
 
+  // Fuse.js instance for fuzzy search (memoised)
+  const fuse = useMemo(() => {
+    return new Fuse(sponsors, {
+      keys: ['organisationName'],
+      threshold: 0.25,
+      distance: 100,
+      ignoreLocation: true,
+      includeScore: true,
+    });
+  }, [sponsors]);
+
   // Client-side filtering and sorting
   const filteredData = useMemo(() => {
     let filtered = sponsors;
 
     if (appliedOrgSearch) {
-      const lowerSearch = appliedOrgSearch.toLowerCase();
-      filtered = filtered.filter(s => 
-        s.organisationName.toLowerCase().includes(lowerSearch)
-      );
+      if (fuzzySearch) {
+        const fuseResults = fuse.search(appliedOrgSearch);
+        const matchedIds = new Set(fuseResults.map(r => r.item.id));
+        filtered = filtered.filter(s => matchedIds.has(s.id));
+      } else {
+        const lowerSearch = appliedOrgSearch.toLowerCase();
+        filtered = filtered.filter(s =>
+          s.organisationName.toLowerCase().includes(lowerSearch)
+        );
+      }
     }
 
     if (selectedTownCities.length > 0) {
@@ -205,7 +225,7 @@ export default function Dashboard() {
     }
 
     return filtered;
-  }, [sponsors, appliedOrgSearch, selectedTownCities, selectedCounties, selectedTypeRatings, selectedRoutes, sortConfig]);
+  }, [sponsors, appliedOrgSearch, fuzzySearch, fuse, selectedTownCities, selectedCounties, selectedTypeRatings, selectedRoutes, sortConfig]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -318,20 +338,50 @@ export default function Dashboard() {
               </div>
               <span className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">Filter & Search</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-start">
-              <div className="relative">
-                <label className="block text-[10px] font-bold text-blue-600/70 uppercase mb-1 ml-1">Organisation</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 items-start">
+              <div className="relative lg:col-span-2">
+                <div className="flex items-center justify-between mb-1 ml-1">
+                  <label className="block text-[10px] font-bold text-blue-600/70 uppercase">Organisation</label>
+                  <button
+                    type="button"
+                    id="fuzzy-search-toggle"
+                    onClick={() => setFuzzySearch(prev => !prev)}
+                    className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all duration-200 border ${
+                      fuzzySearch
+                        ? 'bg-violet-100 text-violet-700 border-violet-300 shadow-sm shadow-violet-200/50'
+                        : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200 hover:text-slate-500'
+                    }`}
+                    title={fuzzySearch ? 'Fuzzy search is ON — matches approximate spellings' : 'Fuzzy search is OFF — exact substring match'}
+                  >
+                    <Sparkles className={`h-2.5 w-2.5 transition-colors duration-200 ${fuzzySearch ? 'text-violet-500' : 'text-slate-400'}`} />
+                    <span>Fuzzy</span>
+                    <span className={`inline-block w-5 h-3 rounded-full relative transition-colors duration-200 ${
+                      fuzzySearch ? 'bg-violet-500' : 'bg-slate-300'
+                    }`}>
+                      <span className={`absolute top-0.5 h-2 w-2 rounded-full bg-white shadow transition-all duration-200 ${
+                        fuzzySearch ? 'left-2.5' : 'left-0.5'
+                      }`} />
+                    </span>
+                  </button>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none z-10">
-                    <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                    {fuzzySearch
+                      ? <Sparkles className="h-3.5 w-3.5 text-violet-400" />
+                      : <Building2 className="h-3.5 w-3.5 text-blue-400" />}
                   </div>
                   <input
                     type="text"
+                    id="org-search-input"
                     value={orgSearch}
                     onChange={(e) => setOrgSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                    placeholder="Search name..."
-                    className="block w-full pl-8 pr-3 py-[7px] border border-blue-200 rounded-md text-xs placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all shadow-sm"
+                    placeholder={fuzzySearch ? 'Fuzzy search name...' : 'Search name...'}
+                    className={`block w-full pl-8 pr-3 py-[7px] border rounded-md text-xs placeholder-slate-400 focus:outline-none focus:ring-1 bg-white transition-all shadow-sm ${
+                      fuzzySearch
+                        ? 'border-violet-200 focus:ring-violet-500 focus:border-violet-500'
+                        : 'border-blue-200 focus:ring-blue-500 focus:border-blue-500'
+                    }`}
                   />
                 </div>
               </div>
