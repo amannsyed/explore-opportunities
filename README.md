@@ -42,7 +42,7 @@ Ensure you have [Node.js](https://nodejs.org/) installed on your system.
 
 1. **Clone the repository** (if you haven't already):
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/amannsyed/explore-opportunities.git
    cd explore-opportunities
    ```
 
@@ -87,6 +87,32 @@ To manually update the data source, you can run the extraction script locally:
 python scripts/fetch_sponsors.py
 ```
 Alternatively, you can replace the `public/sponsors_list.json` file with a newer version matching the identical format.
+## 📁 Project Structure
+
+```text
+explore-opportunities/
+├── public/
+│   ├── sponsors_list.json       # Sponsor data (auto-updated daily)
+│   └── last_updated.json        # Timestamp of last data refresh
+├── src/
+│   ├── components/              # React UI components (filters, charts, table)
+│   ├── App.tsx                  # Root application component
+│   ├── main.tsx                 # React DOM entry point
+│   └── index.css                # Global styles and Tailwind imports
+├── scripts/
+│   └── fetch_sponsors.py        # Python script for data extraction
+├── .github/
+│   └── workflows/
+│       └── update-sponsors.yml  # GitHub Actions daily update workflow
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue.
+
 ## 📝 License
 
 This project is licensed under the MIT License.
