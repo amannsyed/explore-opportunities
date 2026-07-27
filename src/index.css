@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* react-select dark mode overrides */
+.dark .select__control {
+  background-color: var(--color-slate-900) !important;
+  border-color: var(--color-slate-800) !important;
+  color: var(--color-slate-100) !important;
+}
+
+.dark .select__menu {
+  background-color: var(--color-slate-900) !important;
+  border-color: var(--color-slate-800) !important;
+}
+
+.dark .select__option {
+  color: var(--color-slate-100) !important;
+  background-color: transparent !important;
+}
+
+.dark .select__option--is-focused {
+  background-color: var(--color-slate-800) !important;
+}
+
+.dark .select__option--is-selected {
+  background-color: var(--color-blue-600) !important;
+  color: white !important;
+}
+
+.dark .select__single-value {
+  color: var(--color-slate-100) !important;
+}
+
+.dark .select__multi-value {
+  background-color: var(--color-slate-800) !important;
+}
+
+.dark .select__multi-value__label {
+  color: var(--color-slate-200) !important;
+}
+
+.dark .select__input-container {
+  color: var(--color-slate-100) !important;
+}
