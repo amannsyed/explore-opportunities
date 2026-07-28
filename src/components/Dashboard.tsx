@@ -423,7 +423,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans flex flex-col transition-colors duration-300">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 shadow-sm transition-colors duration-300">
-        <div className="max-w-[1600px] mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div className="w-full px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-500" />
             <div>
@@ -486,7 +486,7 @@ export default function Dashboard() {
 
         {/* Prominent Filter Bar */}
         <div className="bg-blue-50/50 dark:bg-slate-800/50 border-t border-blue-100 dark:border-slate-800 shadow-inner transition-colors duration-300">
-          <div className="max-w-[1600px] mx-auto px-4 py-4">
+          <div className="w-full px-4 py-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className="bg-blue-600 dark:bg-blue-500 p-1 rounded">
@@ -642,7 +642,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 py-4">
+      <main className="flex-1 w-full px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Main Table Area */}
           <div className="lg:col-span-3 flex flex-col gap-4">
