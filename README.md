@@ -1,109 +1,148 @@
 # UK Visa Sponsor Dashboard 🇬🇧💼
 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue.svg)](https://amannsyed.github.io/explore-opportunities/)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2-purple.svg)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-38B2AC.svg)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A high-performance, interactive dashboard for exploring and filtering UK Visa Sponsor data. This application loads sponsor data directly from a local JSON file, offering advanced filtering, responsive visualizations, and a streamlined user experience to help users find visa sponsorship opportunities with ease.
+A high-performance, interactive dashboard for exploring UK Visa Sponsor data. Built to handle 140,000+ sponsor records with advanced filtering, fuzzy search, shareable URLs, CSV export, and real-time data visualisations — all in a responsive, full-width layout with dark mode support.
+
+**🔗 [Live Demo →](https://amannsyed.github.io/explore-opportunities/)**
 
 ## ✨ Features
 
-- **Real-Time Advanced Filtering**: Instantly search and filter sponsors by multiple criteria including Organisation Name, Town/City, County, Type & Rating, and Visa Route.
-- **High-Performance Architecture**: Built to handle thousands of data points smoothly using `react-windowed-select` for optimized drop-down rendering without performance degradation.
-- **Interactive Data Visualization**:
-  - **Top 10 Towns/Cities**: A dynamic bar chart illustrating the geographic distribution of sponsors.
-  - **Route Distribution**: A comprehensive pie chart detailing the breakdown of various visa routes.
-- **Robust Data Table**:
-  - Fully sortable and resizable columns for tailored data viewing.
-  - Built-in pagination for effortless navigation through large datasets.
-- **Automated Data Processing**: Intelligently cleans source data on the fly, seamlessly handling missing ("NULL") values and trimming excessive whitespace.
-- **Smooth Animations**: Powered by Framer Motion (`motion`) for a polished and engaging user experience.
+### 🔍 Search & Filtering
+- **Multi-Criteria Filtering** — Filter sponsors by Organisation Name, Town/City, County, Type & Rating, and Visa Route using optimised windowed dropdowns.
+- **Fuzzy Search** — Toggle fuzzy matching (powered by Fuse.js) for approximate organisation name searches with configurable threshold.
+- **Exact Search** — Standard substring matching for precise lookups.
+- **Favorites System** — Star sponsors to bookmark them locally (persisted via localStorage). Filter to show favorites only.
+
+### 📊 Data Visualisation
+- **Top 10 Towns** — Horizontal bar chart showing geographic distribution of sponsors.
+- **Top 10 Counties** — Horizontal bar chart showing county-level sponsor concentration.
+- **Route Distribution** — Donut chart breaking down visa route types (Skilled Worker, Creative Worker, etc.).
+
+### 📋 Data Table
+- **Sortable Columns** — Click any column header to sort ascending/descending.
+- **Resizable Columns** — Drag column borders to resize for custom viewing.
+- **Paginated Navigation** — 15 items per page with a searchable page selector and prev/next controls.
+
+### 🌙 Dark Mode
+- Persistent dark/light mode toggle, respects system preference on first visit.
+- Saved to localStorage so the choice is remembered across sessions.
+
+### 📤 Export & Sharing
+- **Filtered CSV Export** — Download only the currently filtered results as a CSV file.
+- **Full CSV Export** — Download the entire dataset (140,000+ records) as a CSV file.
+- **Shareable URLs** — All active filters are synced to the URL query string, so any filtered view can be copied and shared as a direct link.
+- Uses the File System Access API where available, with a universal blob fallback.
+
+### 🎨 Design & Layout
+- **Full-Width Responsive Layout** — No fixed max-width cap; the dashboard fills the entire viewport edge-to-edge.
+- **Sticky Header & Filter Bar** — Header and filters remain accessible while scrolling through results.
+- **Smooth Transitions** — CSS transitions on theme changes, hover states, and interactive elements.
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework**: [React 18](https://reactjs.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Data Visualization**: [Recharts](https://recharts.org/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Utilities**: `clsx`, `tailwind-merge`, `fuse.js`
+| Category | Technology |
+|---|---|
+| **Frontend** | [React 18](https://reactjs.org/) with TypeScript |
+| **Build Tool** | [Vite 6](https://vitejs.dev/) |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) |
+| **Charts** | [Recharts](https://recharts.org/) |
+| **Icons** | [Lucide React](https://lucide.dev/) |
+| **Search** | [Fuse.js](https://www.fusejs.io/) (fuzzy matching) |
+| **Dropdowns** | [react-windowed-select](https://github.com/jacobworrel/react-windowed-select) (virtualised for performance) |
+| **Animations** | [Framer Motion](https://www.framer.com/motion/) |
+| **Utilities** | `clsx`, `tailwind-merge` |
+| **CI/CD** | GitHub Actions (daily data update + GitHub Pages deploy) |
 
 ## 🚀 Getting Started
 
-Follow these instructions to set up the project locally on your machine.
-
 ### Prerequisites
 
-Ensure you have [Node.js](https://nodejs.org/) installed on your system.
+- [Node.js](https://nodejs.org/) (v18+)
+- [Python 3](https://www.python.org/) (only needed for manual data updates)
 
 ### Installation
 
-1. **Clone the repository** (if you haven't already):
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/amannsyed/explore-opportunities.git
    cd explore-opportunities
    ```
 
-2. **Install the dependencies**:
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Start the development server**:
+3. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-4. **Build for production**:
-   To create a production-ready build, run:
+4. **Build for production:**
    ```bash
    npm run build
-   ```
-   To preview the production build locally:
-   ```bash
-   npm run preview
+   npm run preview   # preview the production build locally
    ```
 
 ## 📊 Data Source & Automation
 
-The application loads sponsor data from `public/sponsors_list.json`. The JSON file is expected to be an array of objects containing the following fields:
-- `Organisation Name`
-- `Town/City`
-- `County`
-- `Type & Rating`
-- `Route`
+The dashboard loads sponsor data from `public/sponsors_list.json` — an array of objects with the following fields:
+
+| Field | Description |
+|---|---|
+| `Organisation Name` | Name of the licensed sponsor |
+| `Town/City` | Town or city of the sponsor |
+| `County` | County of the sponsor |
+| `Type & Rating` | Sponsor type and rating (e.g. "Worker (A Rating)") |
+| `Route` | Visa route (e.g. "Skilled Worker") |
 
 ### 🔄 Automated Daily Updates
-The sponsor data is kept up-to-date automatically. We use a GitHub Actions workflow (`.github/workflows/update-sponsors.yml`) paired with a Python extraction script (`scripts/fetch_sponsors.py`) that runs daily. 
-- It fetches the latest official UK Government CSV file of licensed sponsors.
-- It processes, cleans, and converts the CSV data into an optimized JSON format.
-- If there are updates, it automatically commits the new data (`public/sponsors_list.json` and `public/last_updated.json`) and triggers a new deployment of the dashboard.
+
+The sponsor list is kept current via two GitHub Actions workflows:
+
+1. **`update-sponsors.yml`** — Runs daily to:
+   - Fetch the latest official UK Government CSV of licensed sponsors.
+   - Process, clean, and convert the data to optimised JSON.
+   - Commit updated `public/sponsors_list.json` and `public/last_updated.json` if changes are detected.
+
+2. **`deploy.yml`** — Triggers on pushes to `main` to:
+   - Build the production bundle with Vite.
+   - Deploy to GitHub Pages via `peaceiris/actions-gh-pages`.
 
 ### Manual Data Update
-To manually update the data source, you can run the extraction script locally:
+
 ```bash
 python scripts/fetch_sponsors.py
 ```
-Alternatively, you can replace the `public/sponsors_list.json` file with a newer version matching the identical format.
+
+Or replace `public/sponsors_list.json` with a new file matching the same format.
+
 ## 📁 Project Structure
 
 ```text
 explore-opportunities/
 ├── public/
-│   ├── sponsors_list.json       # Sponsor data (auto-updated daily)
-│   └── last_updated.json        # Timestamp of last data refresh
+│   ├── sponsors_list.json         # Sponsor data (auto-updated daily)
+│   └── last_updated.json          # Timestamp of last data refresh
 ├── src/
-│   ├── components/              # React UI components (filters, charts, table)
-│   ├── App.tsx                  # Root application component
-│   ├── main.tsx                 # React DOM entry point
-│   └── index.css                # Global styles and Tailwind imports
+│   ├── components/
+│   │   ├── Dashboard.tsx          # Main dashboard (table, charts, filters, export)
+│   │   └── FastSelect.tsx         # Optimised windowed dropdown component
+│   ├── data.ts                    # Sponsor type definition
+│   ├── App.tsx                    # Root application component
+│   ├── main.tsx                   # React DOM entry point
+│   └── index.css                  # Global styles and Tailwind imports
 ├── scripts/
-│   └── fetch_sponsors.py        # Python script for data extraction
+│   └── fetch_sponsors.py          # Python script for data extraction
 ├── .github/
 │   └── workflows/
-│       └── update-sponsors.yml  # GitHub Actions daily update workflow
+│       ├── update-sponsors.yml    # Daily data update workflow
+│       └── deploy.yml             # GitHub Pages deployment workflow
 ├── package.json
 ├── tsconfig.json
 └── vite.config.ts
